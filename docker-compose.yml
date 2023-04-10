@@ -8,6 +8,11 @@ services:
       - ./prometheus:/etc/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   grafana:
     image: grafana/grafana:8.3.3
@@ -19,6 +24,11 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     environment:
       GF_INSTALL_PLUGINS: grafana-piechart-panel
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/login"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   house_price_api:
     build:
@@ -30,5 +40,14 @@ services:
       - PROMETHEUS_MULTIPROC_DIR=/tmp
     depends_on:
       - prometheus
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 volumes:
   grafana_data:
+
+networks:
+  default:
+    name: my_network

@@ -27,5 +27,8 @@ jobs:
 
     - name: Docker Compose up test
       run: |
-        docker-compose up --build --abort-on-container-exit --exit-code-from prometheus
+        docker-compose up --build -d
+        timeout 15s sh -c 'until docker-compose logs prometheus | grep "Server is ready to receive web requests."; do sleep 1; done'
+        timeout 15s sh -c 'until docker-compose logs grafana | grep "HTTP Server Listen"; do sleep 1; done'
+        timeout 15s sh -c 'until docker-compose logs house_price_api | grep "Application startup complete"; do sleep 1; done'
         docker-compose down

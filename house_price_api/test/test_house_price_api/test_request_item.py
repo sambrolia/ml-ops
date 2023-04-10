@@ -1,5 +1,6 @@
 import pytest
-from house_price_api.request_item import RequestItem
+# import RequestItem
+from house_price_api.app.request_item import RequestItem
 
 
 def test_request_item_valid():

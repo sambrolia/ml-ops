@@ -1,15 +1,34 @@
 version: "3.9"
 services:
-  web:
-    build: .
+  prometheus:
+    image: prom/prometheus:v2.33.3
     ports:
-      - "80:80"
-    environment:
-      FLASK_DEBUG: True
+      - "9090:9090"
     volumes:
-      - ./src:/app
-      - ./model:/app/model
+      - ./prometheus:/etc/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
 
+  grafana:
+    image: grafana/grafana:8.3.3
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/conf:/etc/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
 
-
-
+  house_price_api:
+    build:
+      context: ./house_price_api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PROMETHEUS_MULTIPROC_DIR=/tmp
+    depends_on:
+      - prometheus
+volumes:
+  grafana_data:

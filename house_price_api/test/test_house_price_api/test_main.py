@@ -1,7 +1,6 @@
-import pytest
 from fastapi.testclient import TestClient
 
-from house_price_api.main import app
+from house_price_api.app.main import app
 
 client = TestClient(app)
 
